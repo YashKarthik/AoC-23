@@ -9,6 +9,7 @@
 bool is_symbol(char schematic[N][N], int row, int col);
 int get_full_number(char schematic[N][N], int row, int &col);
 int sum_neighbors(char schematic[N][N], int symbol_row, int symbol_col);
+int prod_ratio(char schematic[N][N], int symbol_row, int symbol_col);
 
 int main() {
   std::string curr_line;
@@ -31,6 +32,7 @@ int main() {
     }
   }
 
+  // part 1
   int sum{0};
   for (int row{0}; row < lines; row++) {
     for (int col{0}; col < cols; col++) {
@@ -41,7 +43,18 @@ int main() {
     }
   }
 
-  std::cout << "Sum: " << sum << std::endl;
+  std::cout << "Part 1: " << sum << std::endl;
+
+  int gear_ratio{0};
+  for (int row{0}; row < lines; row++) {
+    for (int col{0}; col < cols; col++) {
+      // if not gear, dip
+      if (schematic[row][col] != '*') continue;
+
+      gear_ratio += prod_ratio(schematic, row, col);
+    }
+  }
+  std::cout << "Part 2: " << gear_ratio << std::endl;
 }
 
 bool is_symbol(char schematic[N][N], int row, int col) {
@@ -84,10 +97,28 @@ int sum_neighbors(char schematic[N][N], int symbol_row, int symbol_col) {
       if (!(schematic[row][col] >= 48 && schematic[row][col] <= 57)) continue;
 
       int curr_num = get_full_number(schematic, row, col);
-        std::cout << "Curr num: " << curr_num  << std::endl;
       sum += curr_num;
     }
   }
 
   return sum;
+}
+
+int prod_ratio(char schematic[N][N], int symbol_row, int symbol_col) {
+  int adj{0};
+  int nums[2];
+
+  int i{0};
+  for (int row{ symbol_row - 1}; row <= symbol_row + 1; row++) {
+    for (int col{ symbol_col - 1}; col <= symbol_col + 1; col++) {
+      // if said neighbour is not number, dip
+      if (!(schematic[row][col] >= 48 && schematic[row][col] <= 57)) continue;
+      nums[i] = get_full_number(schematic, row, col);
+      adj++;
+      i++;
+    }
+  }
+
+  if (adj != 2) return 0;
+  return nums[0] * nums[1];
 }
